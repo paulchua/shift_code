@@ -1,0 +1,131 @@
+Option Compare Database
+
+Sub CreateEmails()
+ 
+Dim dbsShift As DAO.Database
+Dim rstData As DAO.Recordset
+Dim strSQL As String
+Dim intI As Integer
+Dim url As String
+Dim raw_serving_url As String
+Dim vehicle_make As String
+Dim vehicle_year As String
+Dim model_trim As String
+Dim original_list_price_usd As Integer
+Dim list_price_usd As Integer
+Dim vehicle_mileage As String
+Dim favorited As Integer
+Dim region As String
+Dim loopIndex As Integer
+
+On Error GoTo ErrorHandler
+ 
+   Set dbsShift = CurrentDb
+ 
+   ' Open a recordset on all records from the Data table
+   strSQL = "SELECT * FROM Data"
+   Set rstData = dbsShift.OpenRecordset(strSQL, dbOpenDynaset)
+ 
+   ' If the recordset is empty, exit.
+   If rstData.EOF Then Exit Sub
+ 
+
+
+'PURPOSE: Create A New Text File
+
+Dim TextFile As Integer
+Dim FilePath As String
+
+'What is the file path and name for the new text file?
+  FilePath = "C:\code_for_email.html"
+
+'Determine the next file number available for use by the FileOpen function
+  TextFile = FreeFile
+
+'Open the text file
+  Open FilePath For Output As TextFile
+  loopIndex = 0
+  
+   With rstData
+      Do Until .EOF
+      loopIndex = loopIndex + 1
+      url = rstData.Fields("url")
+      raw_serving_url = rstData.Fields("raw_serving_url")
+      vehicle_year = rstData.Fields("vehicle_year")
+      vehicle_make = rstData.Fields("vehicle_make")
+      model_trim = rstData.Fields("model_trim")
+      quoted_sale_price_usd = rstData.Fields("original_list_price_usd")
+      current_list_usd = rstData.Fields("list_price_usd")
+      vehicle_mileage = rstData.Fields("mileage")
+      favorited = rstData.Fields("number_of_users_favorited_car")
+      region = rstData.Fields("listing_subregion")
+      
+      
+      
+  If loopIndex Mod 2 = 1 Then
+  
+  Print #TextFile, "<!--Car " & loopIndex & "-->"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td class=""stack-left"" align=""center"" width=""50%"" style=""padding: 0px 0px 0px 20px"">"
+  Print #TextFile, "<table style=""border: 0"">"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"">"
+  Print #TextFile, "<a target=""_blank"" href=""" & url & """>"
+  Print #TextFile, "<img alt=""Car 1"" class=""responsive-image"" width=""240"" style=""width: 100%"" src=""" & raw_serving_url & """></a></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"" style=""padding: 0px 10px; color:#FFFFFF; font-size:16px; font-family: Poppins, sans-serif;""><strong>" & vehicle_year & " " & vehicle_make & "</strong><br>" & model_trim & "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td style=""padding: 0px 10px; font-size:14px; line-height:.9; font-family: Assistant, sans-serif; color:#FFFFFF;"">" & Format(vehicle_mileage, "#,###") & " miles</td>"
+  Print #TextFile, "<td style=""padding: 0px 10px; text-align: right;font-family: Assistant, sans-serif; color:#FFFFFF;""><span><strong>$" & Format(current_list_usd, "#,###") & "</strong></span><br></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  
+  Else
+  
+  Print #TextFile, "<!--Car " & loopIndex & "-->"
+  Print #TextFile, "<td class=""stack-left"" align=""center"" width=""50%"" style=""padding: 0px 20px 0px 0px"">"
+  Print #TextFile, "<table style=""border: 0"">"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"">"
+  Print #TextFile, "<a target=""_blank"" href=""" & url & """>"
+  Print #TextFile, "<img alt=""Car 1"" class=""responsive-image"" width=""240"" style=""width: 100%"" src=""" & raw_serving_url & """></a></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"" style=""padding: 0px 10px; color:#FFFFFF; font-size:16px; font-family: Poppins, sans-serif;""><strong>" & vehicle_year & " " & vehicle_make & "</strong><br>" & model_trim & "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td style=""padding: 0px 10px; font-size:14px; line-height:.9; font-family: Assistant, sans-serif; color:#FFFFFF;"">" & Format(vehicle_mileage, "#,###") & " miles</td>"
+  Print #TextFile, "<td style=""padding: 0px 10px; text-align: right;font-family: Assistant, sans-serif; color:#FFFFFF;""><span><strong>$" & Format(current_list_usd, "#,###") & "</strong></span><br></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+
+  End If
+  
+  rstData.MoveNext
+  Loop
+  End With
+
+
+  
+'Save & Close Text File
+  Close TextFile
+  
+  
+rstData.Close
+dbsShift.Close
+   
+Set fSo = Nothing
+Set rstData = Nothing
+Set dbsShift = Nothing
+   
+
+   Exit Sub
+ 
+ErrorHandler:
+   MsgBox "Error #: " & Err.Number & vbCrLf & vbCrLf & Err.Description
+End Sub
