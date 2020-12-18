@@ -1,0 +1,37 @@
+SELECT DISTINCT leads.created_date, CONCAT('https://shift.com/car/', matrix.URL) AS URL, matrix.RAW_SERVING_URL, matrix.VEHICLE_YEAR, matrix.VEHICLE_MAKE, matrix.MODEL_TRIM,  matrix.ORIGINAL_LIST_PRICE_USD, matrix.LIST_PRICE_USD, matrix.MILEAGE, matrix.NUMBER_OF_USERS_FAVORITED_CAR, matrix.LISTING_SUBREGION, leads.email,leads.source,leads.VIN_INQUIRY_C
+FROM
+(select [o.created_date:pst:date] as created_date
+, account_email_c as email 
+, os.source_grouping as source
+, o.VIN_INQUIRY_C
+from salesforce.opportunity o 
+join salesforce.record_type rt
+on rt.id = o.record_type_id
+join bi.opp_source os
+on os.opportunity_id = o.id
+join bi.inventory_by_day A
+on A.VIN = o.VIN_INQUIRY_C
+where o.created_date > getdate() - interval '30 days' 
+and developer_name = 'Buyer'
+and os.source_grouping not like '%3p%'
+and os.source_grouping not like '%3P%'
+and stage_name = 'Leads'
+and account_email_c is not null
+order by 1 desc
+) leads
+LEFT JOIN
+(SELECT CONCAT('https://shift.com/car/', B.ID) AS URL, C.RAW_SERVING_URL, A.VEHICLE_YEAR, A.VEHICLE_MAKE, B.MODEL_TRIM,  B.ORIGINAL_LIST_PRICE_USD, B.LIST_PRICE_USD, B.MILEAGE, A.NUMBER_OF_USERS_FAVORITED_CAR, A.LISTING_SUBREGION, A.VIN
+FROM bi.inventory_by_day A
+JOIN
+(SELECT VIN,MAX(SNAPSHOT_TIME) as SNAPSHOT_TIME
+ FROM bi.inventory_by_day
+ GROUP BY VIN) groupedMAX
+ON A.SNAPSHOT_TIME = groupedMAX.SNAPSHOT_TIME
+AND A.VIN = groupedMAX.VIN
+JOIN
+etl_frunk.vehicle_listings2 B
+on A.VIN = b.VIN
+JOIN etl_frunk.vehicle_listings2_photos C
+on B.ID = C.__RID
+WHERE C.__INDEX = 0 AND B.UNLIST_REASON IS NULL AND B.SOLD_ON_DATE IS NULL AND B.IS_TEST_DRIVABLE = 't' AND B.DISPLAY_SALE_PENDING = 'f' AND B.DISPLAY_COMING_SOON = 'f' AND B.IS_ARCHIVED= 'f' AND B.DISPLAY_AS_SOLD = 'f') matrix
+ON leads.VIN_INQUIRY_C = matrix.VIN
