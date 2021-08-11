@@ -1,0 +1,171 @@
+Sub CreateEmails()
+ 
+Dim dbsShift As DAO.Database
+Dim rstData As DAO.Recordset
+Dim strSQL As String
+Dim intI As Integer
+Dim url As String
+Dim raw_serving_url As String
+Dim vehicle_make As String
+Dim vehicle_year As String
+Dim model_trim As String
+Dim original_list_price_usd As Integer
+Dim list_price_usd As Integer
+Dim vehicle_mileage As String
+Dim favorited As Integer
+Dim region As String
+Dim loopIndex As Integer
+
+On Error GoTo ErrorHandler
+ 
+   Set dbsShift = CurrentDb
+ 
+   ' Open a recordset on all records from the Data table
+   strSQL = "SELECT * FROM Data ORDER BY sort_order ASC"
+   Set rstData = dbsShift.OpenRecordset(strSQL, dbOpenDynaset)
+ 
+   ' If the recordset is empty, exit.
+   If rstData.EOF Then Exit Sub
+ 
+
+
+'PURPOSE: Create A New Text File
+
+Dim TextFile As Integer
+Dim FilePath As String
+
+'What is the file path and name for the new text file?
+  FilePath = "C:\code_for_email.html"
+
+'Determine the next file number available for use by the FileOpen function
+  TextFile = FreeFile
+
+'Open the text file
+  Open FilePath For Output As TextFile
+  loopIndex = 0
+  rstData.MoveFirst
+  
+   With rstData
+      Do Until .EOF
+      loopIndex = loopIndex + 1
+      url = rstData.Fields("url")
+      raw_serving_url = rstData.Fields("raw_serving_url")
+      vehicle_year = rstData.Fields("vehicle_year")
+      vehicle_make = rstData.Fields("vehicle_make")
+      model_trim = rstData.Fields("model_trim")
+      quoted_sale_price_usd = rstData.Fields("original_list_price_usd")
+      current_list_usd = rstData.Fields("list_price_usd")
+      vehicle_mileage = rstData.Fields("mileage")
+      favorited = rstData.Fields("number_of_users_favorited_car")
+      region = rstData.Fields("listing_subregion")
+      
+      
+      
+  If loopIndex Mod 2 = 1 Then
+  
+  Print #TextFile, "<!--Car " & loopIndex & "-->"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td class=""stack-left"" align=""center"" width=""260"" style=""padding: 0px 0px 0px 0px;border: 1px solid #E9E9E9;border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;"">"
+  Print #TextFile, "<table>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"">"
+  Print #TextFile, "<a target=""_blank"" href=""" & url & """>"
+  Print #TextFile, "<img alt=""Car Image"" class=""responsive-image"" style=""width: 100%"" & src=""" & raw_serving_url & "?w=260&h=180&border=1,FFFFFF&border-radius=5,5,0,0&border-radius-inner=5,5,0,0" & """></a>"
+  'Print #TextFile, "<img alt=""Car Image"" class=""responsive-image"" style=""width: 100%"" & src=""" & raw_serving_url & "?w=260&h=180&border=1,FFFFFF&border-radius=5,5,0,0&border-radius-inner=5,5,0,0&blend=https://blog.shift.com/wp-content/uploads/2021/05/summer_pick_badge_v6.gif&blend-w=100&blend-x=5&blend-y=5&blend-mode=normal" & """></a>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"" style=""padding: 16px 10px; color:#18222e; font-size:16px; font-family: 'Roboto', sans-serif;""><strong>" & vehicle_year & " " & vehicle_make & "</strong><br>" & model_trim & "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td style=""padding: 0px 0px 0px 10px; text-align: left;font-family: 'Roboto', sans-serif; color:#1ba77d;""><span><font style=""color:#1ba77d; font-size:20px;""><strong>$" & Format(current_list_usd, "#,###") & "&nbsp;&nbsp;</strong></font></span></td>"
+  Print #TextFile, "<td style=""padding: 0px 10px 0px 0px; text-align: right; font-size:14px; font-family: 'Roboto', sans-serif; color:#767d8f;"">" & Format(vehicle_mileage, "#,###") & " miles</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td align=""left"" style=""padding:0px 0px 0px 10px""><span><font style=""color:#767d8f; font-size:18px;font-family: 'Roboto', sans-serif;""><s>$" & Format(quoted_sale_price_usd, "#,###") & "</s></font></span></td>"
+  Print #TextFile, "<td  align=""right"">"
+  Print #TextFile, "<table style=""border-collapse: collapse;background-color: #e0faf2;"">"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td valign=""bottom"" ><img src=""https://blog.shift.com/wp-content/uploads/2021/04/eye.gif"" width=""30"" alt=""people watching""></td>"
+  Print #TextFile, "<td style=""background-color: #e0faf2;font-size: 10px; line-height: 1.2; word-break: break-word; text-align: right; vertical-align: middle; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif;color:#0f8763;padding:0px 0px 5px 0px;""><b>" & favorited & " people watching&nbsp;&nbsp;&nbsp;</b></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr><td colspan=""2"" height=""8px""></td></tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "<td>&nbsp;&nbsp;&nbsp;</td>"
+   
+  Else
+  
+  Print #TextFile, "<!--Car " & loopIndex & "-->"
+  Print #TextFile, "<td class=""stack-left"" align=""center""  width=""260"" style=""padding: 0px 0px 0px 0px; border: 1px solid #E9E9E9;border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;"">"
+  Print #TextFile, "<table style=""border: 0"">"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"">"
+  Print #TextFile, "<a target=""_blank"" href=""" & url & """>"
+  Print #TextFile, "<img alt=""Car Image"" class=""responsive-image"" style=""width: 100%"" & src=""" & raw_serving_url & "?w=260&h=180&border=1,FFFFFF&border-radius=5,5,0,0&border-radius-inner=5,5,0,0" & """></a>"
+  'Print #TextFile, "<img alt=""Car Image"" class=""responsive-image"" style=""width: 100%"" & src=""" & raw_serving_url & "?w=260&h=180&border=1,FFFFFF&border-radius=5,5,0,0&border-radius-inner=5,5,0,0&blend=https://blog.shift.com/wp-content/uploads/2021/05/summer_pick_badge_v6.gif&blend-w=100&blend-x=5&blend-y=5&blend-mode=normal" & """></a>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""2"" style=""padding: 16px 10px; color:#18222e; font-size:16px; font-family: 'Roboto', sans-serif;""><strong>" & vehicle_year & " " & vehicle_make & "</strong><br>" & model_trim & "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td style=""padding: 0px 0px 0px 10px; text-align: left;font-family: 'Roboto', sans-serif; color:#1ba77d;""><span><font style=""color:#1ba77d; font-size:20px;""><strong>$" & Format(current_list_usd, "#,###") & "&nbsp;&nbsp;</strong></font></span></td>"
+  Print #TextFile, "<td style=""padding: 0px 10px 0px 0px; text-align: right; font-size:14px; font-family: 'Roboto', sans-serif; color:#767d8f;"">" & Format(vehicle_mileage, "#,###") & " miles</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td align=""left"" style=""padding:0px 0px 0px 10px""><span><font style=""color:#767d8f; font-size:18px;font-family: 'Roboto', sans-serif;""><s>$" & Format(quoted_sale_price_usd, "#,###") & "</s></font></span></td>"
+  Print #TextFile, "<td align=""right"">"
+  Print #TextFile, "<table style=""border-collapse: collapse;background-color: #e0faf2;"">"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td valign=""bottom"" ><img src=""https://blog.shift.com/wp-content/uploads/2021/04/eye.gif"" width=""30"" alt=""people watching""></td>"
+  Print #TextFile, "<td style=""background-color: #e0faf2;font-size: 10px; line-height: 1.2; word-break: break-word; text-align: right; vertical-align: middle; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif;color:#0f8763;padding:0px 0px 5px 0px;""><b>" & favorited & " people watching&nbsp;&nbsp;&nbsp;</b></td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr><td colspan=""2"" height=""8px""></td></tr>"
+  Print #TextFile, "</table>"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td align=""center"" style=""line-height:0; vertical-align: top;""><img src=""https://blog.shift.com/wp-content/uploads/2021/05/drop_shadow_v5.gif"" width=""255"" alt=""border"" >"
+  Print #TextFile, "</td>"
+  Print #TextFile, "<td></td>"
+  Print #TextFile, "<td align=""center"" style=""line-height:0; vertical-align: top;""><img src=""https://blog.shift.com/wp-content/uploads/2021/05/drop_shadow_v5.gif"" width=""255"" alt=""border"" >"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+  'Spacer
+  Print #TextFile, "<tr>"
+  Print #TextFile, "<td colspan=""3"" style=""padding-bottom: 7px;"">"
+  Print #TextFile, "</td>"
+  Print #TextFile, "</tr>"
+
+  End If
+  
+       rstData.MoveNext
+      Loop
+   End With
+
+
+  
+'Save & Close Text File
+  Close TextFile
+  
+  
+rstData.Close
+dbsShift.Close
+   
+Set fSo = Nothing
+Set rstData = Nothing
+Set dbsShift = Nothing
+   
+
+   Exit Sub
+ 
+ErrorHandler:
+   MsgBox "Error #: " & Err.Number & vbCrLf & vbCrLf & Err.Description
+End Sub
