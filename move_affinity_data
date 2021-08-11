@@ -1,0 +1,121 @@
+Sub MoveData()
+ 
+Dim dbsShift As DAO.Database
+Dim rstData1 As DAO.Recordset
+Dim rstData2 As DAO.Recordset
+Dim strSQL1 As String
+Dim strSQL2 As String
+Dim loopIndex As Integer
+
+On Error GoTo ErrorHandler
+ 
+   Set dbsShift = CurrentDb
+
+   ' Open a recordset on all records from the Data table
+   strSQL1 = "SELECT * FROM data1 ORDER BY index"
+   Set rstData1 = dbsShift.OpenRecordset(strSQL1, dbOpenDynaset)
+
+   ' Open a recordset on all records from the Data table
+   strSQL2 = "SELECT * FROM data2"
+   Set rstData2 = dbsShift.OpenRecordset(strSQL2, dbOpenDynaset)
+
+  rstData1.MoveFirst
+
+   With rstData1
+    Do Until .EOF
+
+        rstData2.AddNew
+        rstData2!email = rstData1.Fields("email")
+        
+        rstData2!car_id_1 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_1 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_1 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_1 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_1 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_1 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_1 = rstData1.Fields("mileage")
+        rstData2!url_1 = rstData1.Fields("url")
+        rstData2!raw_serving_url_1 = rstData1.Fields("raw_serving_url")
+        
+        rstData1.MoveNext
+        
+        rstData2!car_id_2 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_2 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_2 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_2 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_2 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_2 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_2 = rstData1.Fields("mileage")
+        rstData2!url_2 = rstData1.Fields("url")
+        rstData2!raw_serving_url_2 = rstData1.Fields("raw_serving_url")
+        
+        rstData1.MoveNext
+        
+        rstData2!car_id_3 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_3 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_3 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_3 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_3 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_3 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_3 = rstData1.Fields("mileage")
+        rstData2!url_3 = rstData1.Fields("url")
+        rstData2!raw_serving_url_3 = rstData1.Fields("raw_serving_url")
+        
+        rstData1.MoveNext
+        
+        rstData2!car_id_4 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_4 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_4 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_4 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_4 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_4 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_4 = rstData1.Fields("mileage")
+        rstData2!url_4 = rstData1.Fields("url")
+        rstData2!raw_serving_url_4 = rstData1.Fields("raw_serving_url")
+        
+        rstData1.MoveNext
+        
+        rstData2!car_id_5 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_5 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_5 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_5 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_5 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_5 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_5 = rstData1.Fields("mileage")
+        rstData2!url_5 = rstData1.Fields("url")
+        rstData2!raw_serving_url_5 = rstData1.Fields("raw_serving_url")
+        
+        rstData1.MoveNext
+        
+        rstData2!car_id_6 = rstData1.Fields("car_id")
+        rstData2!vehicle_make_6 = rstData1.Fields("vehicle_make")
+        rstData2!model_trim_6 = rstData1.Fields("model_trim")
+        rstData2!vehicle_year_6 = rstData1.Fields("vehicle_year")
+        rstData2!original_list_price_usd_6 = rstData1.Fields("max_price")
+        rstData2!list_price_usd_6 = rstData1.Fields("list_price_usd")
+        rstData2!mileage_6 = rstData1.Fields("mileage")
+        rstData2!url_6 = rstData1.Fields("url")
+        rstData2!raw_serving_url_6 = rstData1.Fields("raw_serving_url")
+        
+     
+        rstData2.Update
+        rstData1.MoveNext
+        
+    Loop
+   End With
+  
+  
+rstData1.Close
+rstData2.Close
+dbsShift.Close
+   
+Set rstData1 = Nothing
+Set rstData2 = Nothing
+Set dbsShift = Nothing
+   
+   Exit Sub
+ 
+ErrorHandler:
+   MsgBox "Error #: " & Err.Number & vbCrLf & vbCrLf & Err.Description
+End Sub
+
