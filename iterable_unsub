@@ -1,0 +1,32 @@
+//This Javascript takes a JSON data from Iterable GET /api/users/{email} API and populate the Email Notifcations Tab
+//Here is an example of the Iterable API https://api.iterable.com/api/docs#users_getUser
+
+
+// Store JSON data in a JS variable
+var json = '[5393,62470,62471,62472]'
+
+// Converting JSON-encoded string to JS object
+var obj = JSON.parse(json)
+
+//Checks if Daily Alerts is unsubscribed
+if (!obj.includes(5393)) {
+var daily = document.getElementById('5393');
+        daily.click();
+}
+
+//Checks if "Monthly Newsletters" is unsubscribed
+if (!obj.includes(62470)) {
+var monthly = document.getElementById('62470');
+        monthly.click();
+}
+//Checks if "Monthly Newsletters" is unsubscribed
+if (!obj.includes(62471)) {
+var monthly = document.getElementById('62471');
+        monthly.click();
+}
+
+//Checks if "Other Marketing Messages" is unsubscribed
+if (!obj.includes(62472)) {
+var other = document.getElementById('62472');
+        other.click();
+}
