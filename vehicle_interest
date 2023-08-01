@@ -1,0 +1,11 @@
+select
+vehicle_listings2.vin
+, 'https://shift.com/car/' + vehicle_listings2.id as link_url
+, photos.raw_serving_url
+
+from etl_frunk.vehicle_listings2
+left join (
+	select __rid, raw_serving_url
+    from etl_frunk.vehicle_listings2_photos
+    where type in ('studio', 'unspecified') and __index = '0'
+    ) as photos on photos.__rid = vehicle_listings2.id
